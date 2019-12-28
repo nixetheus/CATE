@@ -2,6 +2,10 @@
 
 A code and text editor written in Python3 using Tkinter.
 
+## Screenshot
+
+![screenshot_one.png](https://github.com/nixetheus/CATE/blob/master/Screenshots/screenshot_one.png)
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine.
