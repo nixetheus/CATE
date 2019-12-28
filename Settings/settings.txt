@@ -1,0 +1,4 @@
+current_project = 
+
+DARK
+last_one = -1
