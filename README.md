@@ -33,4 +33,4 @@ See also the list of [contributors](https://github.com/nixetheus/CATE/graphs/con
 
 ## License
 
-This project is licensed under the GNU GPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE.md) file for details
