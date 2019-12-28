@@ -4,7 +4,7 @@ A code and text editor written in Python3 using Tkinter.
 
 ## Screenshot
 
-![screenshot_one.png]()
+![screenshot_one.png](https://github.com/nixetheus/CATE/blob/master/Screenshots/screenshot_one.png)
 
 ## Getting Started
 
