@@ -5,7 +5,7 @@ import random
 import subprocess
 import webbrowser
 import tkinter as tk
-from PIL import ImageTk
+from PIL import Image, ImageTk
 from tkinter import filedialog
 from tkinter import messagebox
 
@@ -672,13 +672,13 @@ def build_terminal_window(self, current_app, file=None):
 
             close_button.grid(row=0, column=0, pady=(3, 3), padx=(5, 1), sticky=tk.E)
 
-            # LEFT 1  TODO
+            # LEFT 1
             left_1_terminal_canvas = tk.Canvas(embedded_terminal_canvas, width=25, bg=emb_ter_col1, borderwidth=0,
                                                highlightthickness=0, height=176)
             left_1_terminal_canvas.grid_propagate(False)
             left_1_terminal_canvas.grid(row=1, column=0, rowspan=2)
 
-            # LEFT 2  TODO
+            # LEFT 2
             left_2_terminal_canvas = tk.Canvas(embedded_terminal_canvas, width=25, bg=emb_ter_col2, borderwidth=0,
                                                highlightthickness=0, height=176)
             left_2_terminal_canvas.grid_propagate(False)
@@ -700,7 +700,7 @@ def build_terminal_window(self, current_app, file=None):
             bottom_terminal_canvas.grid(row=2, column=2)
 
             # BOTTOM BUTTONS
-            terminal_apps = ["PYTHON", "PYTHON CONSOLE"]
+            terminal_apps = ["PYTHON"]
             for app_n in range(len(terminal_apps)):
 
                 app = terminal_apps[app_n]
@@ -748,8 +748,6 @@ def build_terminal_window(self, current_app, file=None):
 
                 if app == "PYTHON":
                     button_app.config(command=lambda: run_python(self, file))
-                if app == "PYTHON CONSOLE":
-                    button_app.config(command=lambda: run_python_console(self, file))
 
     else:
 
@@ -799,25 +797,6 @@ def run_python(self, file=None):
         run_python(self, file)
 
 
-# TODO
-def run_python_console(self, file=None):
-
-    if not self.embedded_terminal_canvas:
-
-        if self.current_file or file:
-
-            build_terminal_window(self, "PYTHON CONSOLE", file)
-            # center_terminal_canvas = self.terminal_win
-
-            # TODO
-
-    else:
-
-        self.embedded_terminal_canvas.grid_forget()
-        self.embedded_terminal_canvas = None
-        build_terminal_window(self, "PYTHON CONSOLE", file)
-
-
 # DONE
 def open_in_web(self):
 
@@ -826,7 +805,7 @@ def open_in_web(self):
             webbrowser.open("file://" + self.current_file)
 
 
-# TODO
+# DONE
 """
     VIEW MENU FUNCTIONS
 
@@ -866,7 +845,7 @@ def update_spelling_menu(self, menu):
     menu.entryconfig(2, accelerator=str(self.spelling_text))
 
 
-# DONE   TODO: settings
+# DONE
 def set_colors(self, color):
 
     global ln_color
@@ -1030,6 +1009,7 @@ def change_color_ide(self):
     show_project_view(self, text_color, project_color)
 
 
+# DONE
 """
     AUTOCOMPLETE FUNCTIONS
 
@@ -1047,19 +1027,17 @@ def change_color_ide(self):
 """
 
 
-# TODO ??? + Get key focus for autocomplete menu
+# DONE
 def on_key_pressing(self, key):
 
     # Remove Autocomplete Menu
     self.autocomplete_win.withdraw()
-    widgets = self.autocomplete_win.grid_slaves()
 
     # Forget everything
-    for widget in widgets:
+    for widget in self.autocomplete_win.grid_slaves():
         widget.grid_forget()
 
     get_file_keywords(self)
-
     if type(key.char) == str:
 
         if key.char == " ":
@@ -1080,8 +1058,8 @@ def on_key_pressing(self, key):
 
     if key.keycode == 8:
 
-        l = len(self.current_word)
-        self.current_word = self.current_word[:l-1]
+        word_len = len(self.current_word)
+        self.current_word = self.current_word[:word_len - 1]
 
     elif key.keycode == 13:
 
@@ -1107,24 +1085,23 @@ def on_key_pressing(self, key):
         self.autocomplete_win.config(relief=tk.RIDGE)
         autocomplete_options.sort(key=lambda s: len(s))
 
-        l = len(autocomplete_options)
+        length = len(autocomplete_options)
 
         # Set position at cursor
         cursor_y, cursor_x = map(int, self.file_content.index(tk.INSERT).split("."))
         x = self.root.winfo_rootx()
         y = self.root.winfo_rooty()
         self.autocomplete_win.geometry("%dx%d+%d+%d" %
-                                       (208, min(250, l * 25 + 2), x + 265 + cursor_x * 8, y + 62 + cursor_y * 16))
+                                       (250, min(250, length * 25 + 2), x + 265 + cursor_x * 8, y + 62 + cursor_y * 16))
 
         index = 0
         for word in set(autocomplete_options):
-            if len(word[0]) > 15:
-                txt = " " * 4 + word[0]
-            else:
-                txt = " " * 4 + word[0] + " " * ((15-len(word[0]))+10)  # TODO + word[1]
-            button_auto = tk.Button(self.autocomplete_win, height=0, width=195, text=txt,
+
+            txt = " " * 4 + word[0]
+
+            button_auto = tk.Button(self.autocomplete_win, width=238, text=txt, font=medium_font,
                                     relief=tk.FLAT, bg=project_color, fg=text_color,
-                                    highlightbackground=white, border=2, command=None, anchor=tk.W,
+                                    highlightbackground=white, border=2, anchor=tk.W,
                                     compound="left")
 
             if word[1] == "Function":
@@ -1143,28 +1120,22 @@ def on_key_pressing(self, key):
                 module_icon = ImageTk.PhotoImage(file=os.getcwd()+"\\AutocompleteIcons\\module.png")
                 button_auto.config(image=module_icon)
                 button_auto.image = module_icon
+            elif word[1] == "Standard":
+                module_icon = ImageTk.PhotoImage(file=os.getcwd()+"\\AutocompleteIcons\\standard.png")
+                button_auto.config(image=module_icon)
+                button_auto.image = module_icon
 
             button_auto.grid(row=index, padx=0, sticky=tk.W)
             self.auto_buttons[index] = button_auto
 
             button_auto.bind("<Enter>", lambda event, h=button_auto: h.configure(bg=files_color))
             button_auto.bind("<Leave>", lambda event, h=button_auto: h.configure(bg=project_color))
-            button_auto.bind('<Button-1>', lambda event, w=word: autocomplete_word(self, event, w[0]))
+            button_auto.bind('<Button-1>', lambda event, w=word: autocomplete_word(self, w[0]))
 
             index += 1
 
-        # TODO: fix
-        """if key.keycode == 38:
-            self.auto_buttons[self.auto_n_button].configure(bg=PROJECT_COLOR)
-            self.auto_n_button = max(0, self.auto_n_button - 1)
-            self.auto_buttons[self.auto_n_button].configure(bg=FILES_COLOR)
-        if key.keycode == 40:
-            self.auto_buttons[self.auto_n_button].configure(bg=PROJECT_COLOR)
-            self.auto_n_button = min(index-1, self.auto_n_button + 1)
-            self.auto_buttons[self.auto_n_button].configure(bg=FILES_COLOR)"""
 
-
-# TODO SCOPE!!!!!!!!!!!
+# DONE
 def get_file_keywords(self):
 
     self.key_words = []
@@ -1180,8 +1151,6 @@ def get_file_keywords(self):
                                "True", "False"]
             for p_keyword in python_keywords:
                 self.key_words.append((p_keyword, "Standard"))
-
-            # TODO: add std functions, semantic bugs
 
             # get lines
             file = open(self.current_file, "r")
@@ -1211,10 +1180,10 @@ def get_file_keywords(self):
 
 
 # DONE
-def autocomplete_word(self, event, word):
+def autocomplete_word(self, word):
 
-    l = len(self.current_word)
-    missing = word[l:]
+    word_len = len(self.current_word)
+    missing = word[word_len:]
     self.current_word = ""
     self.autocomplete_win.withdraw()
 
@@ -1241,10 +1210,15 @@ def display_file_path(self):
     for button in self.path_buttons:
         button.destroy()
 
+    for col in range(self.max_cols):
+        try:
+            self.top_canvas.columnconfigure(col + 1, weight=0)
+        except AttributeError:
+            pass
+
     if self.current_file:
 
-        current_dir = self.current_project_dir.rstrip().split("/")[len(self.current_project_dir.split("/")) - 1]
-        current_file_path = self.current_file[len(self.current_project_dir) - len(current_dir) - 1:].split("/")
+        current_file_path = self.current_file.replace(self.current_project_dir, "").split("/")
 
         current_file_path = [file_or_dir for file_or_dir in current_file_path if file_or_dir]
 
@@ -1254,9 +1228,13 @@ def display_file_path(self):
             width = 30 + int(len(current_file_path[file_or_dir]) * 6)
 
             new_button_file = tk.Button(self.top_canvas, text="  " + current_file_path[file_or_dir],
-                                        width=width, bd=1, highlightthickness=0.5, anchor=tk.W, 
+                                        width=width, bd=1, highlightthickness=0.5, anchor=tk.W,
                                         bg=top_bottom_color, fg=text_color, highlightcolor=text_editor_color)
-            new_button_file.grid(row=0, column=file_or_dir * 2, padx=(0, 0.5), pady=(1, 2))
+            new_button_file.grid(row=0, column=file_or_dir * 2, padx=(0, 0.5), pady=(1, 2), sticky=tk.W)
+            try:
+                self.top_canvas.columnconfigure(file_or_dir * 2, weight=0)
+            except AttributeError:
+                pass
 
             new_button_file.bind('<Button-1>', lambda e: 'break')  # No relief when pressed
             new_button_file.configure(activebackground=main_file_color, activeforeground=text_color, 
@@ -1282,7 +1260,11 @@ def display_file_path(self):
 
                 path_arrow_button = tk.Button(self.top_canvas, text="", bd=1, highlightthickness=0.5, anchor=tk.W,
                                               bg=top_bottom_color, fg=text_color, highlightcolor=text_editor_color)
-                path_arrow_button.grid(row=0, column=(file_or_dir * 2) + 1, padx=(0, 0.5), pady=(2, 2))
+                path_arrow_button.grid(row=0, column=(file_or_dir * 2) + 1, padx=(0, 0.5), pady=(2, 2), sticky=tk.W)
+                try:
+                    self.top_canvas.columnconfigure(file_or_dir * 2 + 1, weight=0)
+                except AttributeError:
+                    pass
 
                 path_arrow_button.bind('<Button-1>', lambda e: 'break')  # No relief when pressed
                 path_arrow_button.configure(activebackground=main_file_color, activeforeground=text_color,
@@ -1316,6 +1298,9 @@ def display_file_path(self):
             run_button.image = path_arrow_icon
 
             self.path_buttons.append(run_button)
+
+        if len(current_file_path) + 1 > self.max_cols:
+            self.max_cols = len(current_file_path) + 1
 
 
 # DONE
@@ -1493,8 +1478,7 @@ def print_project_folder_view(self, but_w):
             # Place button and bind it for left and right mouse click
             dir_button.grid(row=button_to_be + 1, padx=5 + self.project_files_dirs[button_to_be][1] * 15, sticky=tk.W)
             dir_button.bind("<Button-1>", lambda e, f=self.project_files_dirs[button_to_be][0]: close_folder(self, f))
-            dir_button.bind("<Button-3>", lambda event, f=self.project_files_dirs[button_to_be][0]:
-                            right_click_folder_menu(self, event, f))
+            dir_button.bind("<Button-3>", lambda e: None)
 
             self.project_view_buttons.append(dir_button)
 
@@ -1600,54 +1584,48 @@ def change_text_content(self):
                 elif os.path.splitext(self.current_file)[1] == ".txt":
                     speller(self)
 
-                """elif os.path.splitext(self.current_file)[1] == ".html":
-                    html_watcher(self)
-                elif os.path.splitext(self.current_file)[1] == ".c":
-                    c_watcher(self)
-                elif os.path.splitext(self.current_file)[1] == ".cs":
-                    c_sharp_watcher(self)"""
+        # image show, pretty much
+        elif os.path.splitext(self.current_file)[1] in [".png", ".jpg", ".jpeg"]:
 
-        # image show, pretty much  TODO
-        """elif os.path.splitext(self.current_file)[1] in [".png", ".jpg", ".jpeg"]:
             self.file_content.config(state=tk.NORMAL)
             self.file_content.delete(0.0, tk.END)
             self.file_content.config(state=tk.DISABLED)
-            #self.line_number.config(state=tk.NORMAL)
-            #self.line_number.delete(0.0, tk.END)
-            #self.line_number.config(state=tk.DISABLED)
             try:
                 self.current_image.place_forget()
             except AttributeError:
                 pass
+
             try:
+
                 load = Image.open(self.current_file)
 
-                w, h = load.size
+                original_image_width, original_image_height = load.size
+                global_width, global_height = screen_width - int((screen_width / 10)), int(screen_height * (87/100))
 
-                if abs(W - w) > abs(H - h):
-                    if w > (W - 100):
-                        ratio = (w - (W - 100)) / w
-                        w = (W - 100)
-                        h = int(h - (h * ratio))
-                    elif h > (H - 100):
-                        ratio = (h - (H - 100)) / h
-                        h = (H - 100)
-                        w = w - (w * ratio)
+                if abs(global_width - original_image_width) > abs(global_height - original_image_height):
+                    if original_image_width > (global_width - 100):
+                        ratio = (original_image_width - (global_width - 100)) / original_image_width
+                        original_image_width = (global_width - 100)
+                        original_image_height = int(original_image_height - (original_image_height * ratio))
+                    elif original_image_height > (global_height - 100):
+                        ratio = (original_image_height - (global_height - 100)) / original_image_height
+                        original_image_height = (global_height - 100)
+                        original_image_width = original_image_width - (original_image_width * ratio)
                 else:
-                    if h > (H - 100):
-                        ratio = (h - (H - 100)) / h
-                        h = (H - 100)
-                        w = int(w - (w * ratio))
-                    elif w > (W - 100):
-                        ratio = (w - (W - 100)) / w
-                        w = (W - 100)
-                        h = int(h - (h * ratio))
+                    if original_image_height > (global_height - 100):
+                        ratio = (original_image_height - (global_height - 100)) / original_image_height
+                        original_image_height = (global_height - 100)
+                        original_image_width = int(original_image_width - (original_image_width * ratio))
+                    elif original_image_width > (global_width - 100):
+                        ratio = (original_image_width - (global_width - 100)) / original_image_width
+                        original_image_width = (global_width - 100)
+                        original_image_height = int(original_image_height - (original_image_height * ratio))
 
-                res_load = load.resize((w, h), Image.ANTIALIAS)
+                res_load = load.resize((original_image_width, original_image_height), Image.ANTIALIAS)
                 render = ImageTk.PhotoImage(res_load)
 
-                height = (H - h - 35) // 2
-                width = (W - w - 90) // 2
+                height = (global_height - original_image_height - 35) // 2
+                width = (global_width - original_image_width - 90) // 2
 
                 if height < 0:
                     height = 0
@@ -1657,14 +1635,14 @@ def change_text_content(self):
                 # labels can be text or images
                 self.current_image = tk.Label(self.file_content, image=render)
                 self.current_image.image = render
-                self.current_image.place(x=width, y=height, width=w, h=h)
+                self.current_image.place(x=width, y=height, width=original_image_width, h=original_image_height)
 
             except OSError:
                 messagebox.showerror("Can't open file", "File may bw corrupted or not exist")
 
-            self.display_file_names()
+            display_file_names(self)
         else:
-            messagebox.showinfo("File not supported")"""
+            messagebox.showinfo("File not supported")
 
     else:
 
@@ -1677,9 +1655,12 @@ def change_text_content(self):
         self.file_content.insert(tk.INSERT, text)
         self.file_content.config(state=tk.DISABLED)
 
-        self.line_number_canvas.config(state=tk.NORMAL)
-        self.line_number_canvas.delete(0.0, tk.END)
-        self.line_number_canvas.config(state=tk.DISABLED)
+        try:
+            self.line_number_canvas.config(state=tk.NORMAL)
+            self.line_number_canvas.delete(0.0, tk.END)
+            self.line_number_canvas.config(state=tk.DISABLED)
+        except AttributeError:
+            pass
 
         try:
             self.current_image.place_forget()
@@ -1878,73 +1859,6 @@ def on_click_filename(self, file):
 
 
 # DONE
-def project_view_folder_right_menu(self, tc, tec):
-
-    right_folder_menu = tk.Menu(self.root, tearoff=0, fg=tc, bg=tec)
-
-    # For GUI updates
-    try:
-        self.all_elements_bg[13].append(right_folder_menu)
-    except KeyError:
-        self.all_elements_bg[13] = [right_folder_menu]
-    try:
-        self.all_elements_fg[2].append(right_folder_menu)
-    except KeyError:
-        self.all_elements_fg[2] = [right_folder_menu]
-
-    # New sub-menu
-    new_menu = tk.Menu(self.root, tearoff=0, bg=text_editor_color, fg=text_color)
-
-    # For GUI updates
-    try:
-        self.all_elements_bg[13].append(new_menu)
-    except KeyError:
-        self.all_elements_bg[13] = [new_menu]
-    try:
-        self.all_elements_fg[2].append(new_menu)
-    except KeyError:
-        self.all_elements_fg[2] = [new_menu]
-
-    new_menu.add_command(label="File", command=lambda: None)
-    new_menu.add_command(label="HTML File", command=lambda: None)
-    new_menu.add_command(label="Python File", command=lambda: None)
-    new_menu.add_separator()
-
-    new_menu.add_command(label="Directory", command=lambda: None)
-
-    right_folder_menu.add_cascade(label="New...", menu=new_menu)
-    right_folder_menu.add_separator()
-
-    # Refactor sub-menu
-    ref_menu = tk.Menu(self.root, tearoff=0, bg=text_editor_color, fg=text_color)
-
-    # For GUI updates
-    try:
-        self.all_elements_bg[13].append(ref_menu)
-    except KeyError:
-        self.all_elements_bg[13] = [ref_menu]
-    try:
-        self.all_elements_fg[2].append(ref_menu)
-    except KeyError:
-        self.all_elements_fg[2] = [ref_menu]
-
-    ref_menu.add_command(label="Rename File", command=lambda: None)
-    ref_menu.add_command(label="Delete File", command=lambda: None)
-
-    right_folder_menu.add_cascade(label="Refactor", menu=ref_menu)
-
-    return right_folder_menu
-
-
-# DONE
-def right_click_folder_menu(self, event, f):
-
-    self.right_click_folder = f
-    self.right_project_view_folder_m.tk_popup(event.x_root, event.y_root)
-    return 0
-
-
-# DONE
 def project_view_file_right_menu(self, tc, tec):
 
     right_file_menu = tk.Menu(self.root, tearoff=0, fg=tc, bg=tec)
@@ -2030,7 +1944,7 @@ def ask_rename_file(self, f):
 
 
 # DONE
-def rename_file(self, file, new_name, root=None, d=None, n=0):
+def rename_file(self, file, new_name, root=None):
 
     self.current_project_dir = self.current_project_dir.rstrip()
 
@@ -2050,9 +1964,6 @@ def rename_file(self, file, new_name, root=None, d=None, n=0):
         messagebox.showerror("Invalid Name", "The name you inserted is not valid")
         return 1
 
-    # Search for occurrences of the file for a safe rename.
-    # TODO
-
     # Rename File
     basename = os.path.basename(file)
     file_dir = self.current_project_dir + file.replace(self.current_project_dir, "").replace(basename, "")
@@ -2069,10 +1980,7 @@ def rename_file(self, file, new_name, root=None, d=None, n=0):
 # DONE
 def ask_delete_file(self, file):
 
-    # Search for occurrences of the file for a safe rename.
-    # TODO
-
-    if messagebox.askyesno("Delete file", "Occurrences of the file have been found, do you really wanna delete it?"):
+    if messagebox.askyesno("Delete file", "Are you sure you want to delete this file?"):
 
         os.remove(self.current_project_dir + "/" + file)
 
@@ -2087,7 +1995,7 @@ def ask_delete_file(self, file):
         show_project_view(self, text_color, project_color)
 
     else:
-        self.delete = False
+        pass
 
 
 # DONE
@@ -2104,6 +2012,9 @@ def ask_delete_file(self, file):
 
 # DONE
 def python_watcher(self):
+
+    for tag in self.file_content.tag_names():
+        self.file_content.tag_delete(tag)
 
     if self.current_file is not None:
 
@@ -2124,15 +2035,16 @@ def python_watcher(self):
 
                 for i in range(len(positions)):
                     try:
-                        if self.file_content.get(fp[i][:3]+str(int(fp[i][3:])+1)).isalnum() and not \
-                           self.file_content.get(fp[i][:3]+str(int(fp[i][3:])+1)).isalnum():
-
+                        prev = int(positions[i].split(".")[1]) - 1
+                        prev_char = positions[i].split(".")[0] + "." + str(prev)
+                        next_char = fp[i].split(".")[0] + "." + str(int(fp[i].split(".")[1]))
+                        if self.file_content.get(next_char) == " " and \
+                                (prev < 0 or self.file_content.get(prev_char) == " "):
                             self.file_content.tag_add("keyword", positions[i], fp[i])
-
                     except ValueError:
                         pass
 
-            self.file_content.tag_configure("keyword", foreground="#ffa72f")
+            self.file_content.tag_configure("keyword", foreground="#FF0000")
 
             # import
             keywords_positions = search_index_list(self, ["import", "from", "==", "!=", ">", "<", ">=", "<=", "="])
@@ -2140,11 +2052,18 @@ def python_watcher(self):
                 positions = keywords_positions[keyword]
                 fp = []
                 for pos in positions:
-                    fp.append(pos.split('.')[0] + "." +
-                              str(int(pos.split('.')[1]) + len(keyword)))
+                    fp.append(pos.split('.')[0] + "." + str(int(pos.split('.')[1]) + len(keyword)))
                 for i in range(len(positions)):
-                    self.file_content.tag_add("red",
-                                              positions[i], fp[i])
+                    try:
+                        prev = int(positions[i].split(".")[1]) - 1
+                        prev_char = positions[i].split(".")[0] + "." + str(prev)
+                        next_char = fp[i].split(".")[0] + "." + str(int(fp[i].split(".")[1]))
+                        if self.file_content.get(next_char) == " " and \
+                                (prev < 0 or self.file_content.get(prev_char) == " "):
+                            self.file_content.tag_add("red", positions[i], fp[i])
+                    except ValueError:
+                        pass
+
             self.file_content.tag_configure("red", foreground="#ff595e")
 
             # conditions
@@ -2153,38 +2072,39 @@ def python_watcher(self):
                 positions = keywords_positions[keyword]
                 fp = []
                 for pos in positions:
-                    fp.append(pos.split('.')[0] + "." +
-                              str(int(pos.split('.')[1]) + len(keyword)))
+                    fp.append(pos.split('.')[0] + "." + str(int(pos.split('.')[1]) + len(keyword)))
                 for i in range(len(positions)):
-                    self.file_content.tag_add("green",
-                                              positions[i], fp[i])
+                    try:
+                        prev = int(positions[i].split(".")[1]) - 1
+                        prev_char = positions[i].split(".")[0] + "." + str(prev)
+                        next_char = fp[i].split(".")[0] + "." + str(int(fp[i].split(".")[1]))
+                        if self.file_content.get(next_char) == " " and \
+                                (prev < 0 or self.file_content.get(prev_char) == " "):
+                            self.file_content.tag_add("green", positions[i], fp[i])
+                    except ValueError:
+                        pass
+
             self.file_content.tag_configure("green", foreground="#FFD300")
 
             # loops
-            keywords_positions = search_index_list(self, ["while", "return", "pass",
-                                                   "for", "continue"])
+            keywords_positions = search_index_list(self, ["while", "return", "pass", "for", "continue"])
             for keyword in keywords_positions.keys():
                 positions = keywords_positions[keyword]
                 fp = []
                 for pos in positions:
-                    fp.append(pos.split('.')[0] + "." +
-                              str(int(pos.split('.')[1]) + len(keyword)))
+                    fp.append(pos.split('.')[0] + "." + str(int(pos.split('.')[1]) + len(keyword)))
                 for i in range(len(positions)):
-                    self.file_content.tag_add("b",
-                                              positions[i], fp[i])
-            self.file_content.tag_configure("b", foreground=for_color)
+                    try:
+                        prev = int(positions[i].split(".")[1]) - 1
+                        prev_char = positions[i].split(".")[0] + "." + str(prev)
+                        next_char = fp[i].split(".")[0] + "." + str(int(fp[i].split(".")[1]))
+                        if self.file_content.get(next_char) == " " and \
+                                (prev < 0 or self.file_content.get(prev_char) == " "):
+                            self.file_content.tag_add("b", positions[i], fp[i])
+                    except ValueError:
+                        pass
 
-            # print
-            keywords_positions = search_index_list(self, ["print", "self", "__init__"])
-            for keyword in keywords_positions.keys():
-                positions = keywords_positions[keyword]
-                fp = []
-                for pos in positions:
-                    fp.append(pos.split('.')[0] + "." +
-                              str(int(pos.split('.')[1]) + len(keyword)))
-                for i in range(len(positions)):
-                    self.file_content.tag_add("v", positions[i], fp[i])
-            self.file_content.tag_configure("v", foreground="#df7dff")
+            self.file_content.tag_configure("b", foreground=for_color)
 
             # short comments
             keywords_positions = search_index_list(self, ["#"])
@@ -2194,8 +2114,16 @@ def python_watcher(self):
                 for pos in positions:
                     fp.append(str(int(pos.split('.')[0])+1)+".0")
                 for i in range(len(positions)):
-                    self.file_content.tag_add("pycomm",
-                                              positions[i], fp[i]+"-1c")
+                    try:
+                        prev = int(positions[i].split(".")[1]) - 1
+                        prev_char = positions[i].split(".")[0] + "." + str(prev)
+                        next_char = fp[i].split(".")[0] + "." + str(int(fp[i].split(".")[1]))
+                        if self.file_content.get(next_char) == " " and \
+                                (prev < 0 or self.file_content.get(prev_char) == " "):
+                            self.file_content.tag_add("pycomm", positions[i], fp[i]+"-1c")
+                    except ValueError:
+                        pass
+
             self.file_content.tag_configure("pycomm", foreground="#817c7d")
 
             # long comments
@@ -2205,12 +2133,10 @@ def python_watcher(self):
                 p = positions[keyword]
                 for i in range(len(p)):
                     try:
-                        self.file_content.tag_add("pyl_comm", p[i],
-                                                  fp["\"\"\""][i] + "+2c")
+                        self.file_content.tag_add("pyl_comm", p[i],  fp["\"\"\""][i] + "+2c")
                     except IndexError:
                         pass
-            self.file_content.tag_configure("pyl_comm",
-                                            foreground="#817c7d")
+            self.file_content.tag_configure("pyl_comm", foreground="#817c7d")
 
             # string "
             positions = search_index_list(self, ["\""])
@@ -2220,8 +2146,7 @@ def python_watcher(self):
                 f = fp["\""][1::2]
                 for i in range(len(p)):
                     try:
-                        self.file_content.tag_add("py_str", p[i],
-                                                  f[i] + "+1c")
+                        self.file_content.tag_add("py_str", p[i], f[i] + "+1c")
                     except IndexError:
                         pass
             self.file_content.tag_configure("py_str", foreground="#009936")
@@ -2248,11 +2173,18 @@ def python_watcher(self):
                     fp.append(pos.split('.')[0] + "." +
                               str(int(pos.split('.')[1]) + len(keyword)))
                 for i in range(len(positions)):
-                    self.file_content.tag_add("todo_py",
-                                              positions[i]+"+2c", fp[i])
+                    try:
+                        prev = int(positions[i].split(".")[1]) - 1
+                        prev_char = positions[i].split(".")[0] + "." + str(prev)
+                        next_char = fp[i].split(".")[0] + "." + str(int(fp[i].split(".")[1]))
+                        if self.file_content.get(next_char) == " " and \
+                                (prev < 0 or self.file_content.get(prev_char) == " "):
+                            self.file_content.tag_add("todo_py", positions[i]+"+2c", fp[i])
+                    except ValueError:
+                        pass
             self.file_content.tag_configure("todo_py", foreground="#ffff00")
 
-            self.root.after(5000, lambda: python_watcher(self))
+            self.root.after(1000, lambda: python_watcher(self))
 
 
 # DONE
@@ -2287,7 +2219,6 @@ def speller(self):
             for misspelled_word in misspelled_word_indexes.keys():
 
                 start_indexes = misspelled_word_indexes[misspelled_word]
-                indexes = []
 
                 for i in range(len(start_indexes)):
                     index = start_indexes[i]
@@ -2304,6 +2235,7 @@ def speller(self):
                 self.file_content.tag_configure("misspelled", underline=0)
 
 
+# DONE
 """
     OTHER MISC FUNCTIONS
 

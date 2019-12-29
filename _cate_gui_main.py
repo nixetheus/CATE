@@ -1,7 +1,8 @@
+import random
 import webbrowser
 import tkinter as tk
-import _cate_gui_main_helpers as gmh
 import _cate_extra_helpers as ceh
+import _cate_gui_main_helpers as gmh
 
 # COLORS
 white = "#FFF"
@@ -32,7 +33,6 @@ numbered_lines = True
 """ SETTINGS """
 
 
-# TODO: general fonts work all gui + font selections + more fonts
 def load_extra_fonts():
     ceh.loadfont("/Fonts/Hack-Regular.tff")
 
@@ -59,24 +59,82 @@ def set_colors(self):
     n_colors = 15
     if self.current_color == "DARK":
         colors = {
-            0: "#191919",
-            1: "#55FBF7",
-            2: "#DEDEDE",
-            3: "#242424",
-            4: "#494949",
-            5: "#5A5A5A",
-            6: "#111111",
-            7: "#484848",
-            8: "#383838",
-            9: "#3E3E3E",
-            10: "#585858",
-            11: "#6CF970",
-            12: "#484848",
-            13: "#151515",
-            14: "#333333"
+            0: "#191919",  # ln_color
+            1: "#55FBF7",  # for_color
+            2: "#DEDEDE",  # text_color
+            3: "#242424",  # files_color
+            4: "#494949",  # emb_ter_col1
+            5: "#5A5A5A",  # emb ter_col2
+            6: "#111111",  # project_color
+            7: "#484848",  # replace_butt_c
+            8: "#383838",  # line_number_hb
+            9: "#3E3E3E",  # file_bar_color
+            10: "#585858",  # main_file_color
+            11: "#6CF970",  # condition_color
+            12: "#484848",  # top_bottom_color
+            13: "#151515",  # text_editor_color
+            14: "#333333"  # proj_view_men_color
         }
+    elif self.current_color == "BLUE":
+        colors = {
+            0: "#130061",
+            1: "#000",
+            2: "#FFFFFF",
+            3: "#1B00B3",
+            4: "#301399",
+            5: "#306199",
+            6: "#070B2C",
+            7: "#004799",
+            8: "#482E9B",
+            9: "#000",
+            10: "#130080",
+            11: "#000",
+            12: "#139CCB",
+            13: "#130080",
+            14: "#306199"
+        }
+    elif self.current_color == "ICEY":
+        colors = {
+            0: "#D3E5E8",
+            1: "#000",
+            2: "#000000",
+            3: "#7DB5BA",
+            4: "#A2E8E8",
+            5: "#CEE8E8",
+            6: "#E2E9F0",
+            7: "#94C0CE",
+            8: "#B8F3F6",
+            9: "#000",
+            10: "#B9E1EB",
+            11: "#000",
+            12: "#FFFFFF",
+            13: "#B9E1EB",
+            14: "#94C0CE"
+        }
+    elif self.current_color == "WHITE":
+        colors = {
+            0: "#FFFFFF",  # ln_color
+            1: "#FFFFFF",  # for_color
+            2: "#000000",  # text_color
+            3: "#EFEFEF",  # files_color
+            4: "#EEEEEE",  # emb_ter_col1
+            5: "#DDDDDD",  # emb ter_col2
+            6: "#CCCCCC",  # project_color
+            7: "#EEEEEE",  # replace_butt_c
+            8: "#FFFFFF",  # line_number_hb
+            9: "#FFFFFF",  # file_bar_color
+            10: "#EEEEEE",  # main_file_color
+            11: "#FFFFFF",  # condition_color
+            12: "#DDDDDD",  # top_bottom_color
+            13: "#FFFFFF",  # text_editor_color
+            14: "#AAAAAA"  # proj_view_men_color
+        }
+    elif self.current_color == "RANDOM":
+        rand255 = lambda: random.randint(0, 255)
+        colors = ['#%02X%02X%02X' % (rand255(), rand255(), rand255()) for _ in range(n_colors)]
     else:
-        colors = ["#FFF" for _ in range(n_colors)]
+        rand255 = lambda: random.randint(0, 255)
+        colors = ['#%02X%02X%02X' % (rand255(), rand255(), rand255()) for _ in range(n_colors)]
 
     ln_color = colors[0]
     for_color = colors[1]
@@ -140,9 +198,6 @@ def gui_main(self):
 
     right_project_view_file_m = gmh.project_view_file_right_menu(self, text_color, text_editor_color)
     self.right_project_view_file_m = right_project_view_file_m
-    
-    right_project_view_folder_m = gmh.project_view_folder_right_menu(self, text_color, text_editor_color)
-    self.right_project_view_folder_m = right_project_view_folder_m
 
     # FILE BAR CANVAS
     file_bar = file_bar_creation(main_canvas, 25, screen_width - (screen_width // 10), files_color)
@@ -340,7 +395,8 @@ def run_menu_creation(self, menu, tc, tec):
 def view_menu_creation(self, menu, tc, tec):
 
     # View menu
-    view_menu = tk.Menu(menu, tearoff=0, fg=tc, bg=tec)
+    view_menu = tk.Menu(menu, tearoff=0, fg=tc, bg=tec,
+                        postcommand=lambda: view_menu.entryconfig(1, accelerator=str(self.spelling_text)))
 
     # View menu entries
     view_menu.add_command(label="Line Number        ", command=lambda: gmh.write_n_lines(self))
@@ -355,10 +411,6 @@ def view_menu_creation(self, menu, tc, tec):
     themes_menu.add_command(label="Dark             ", command=lambda: gmh.set_colors(self, "DARK"))
     themes_menu.add_command(label="Blue             ", command=lambda: gmh.set_colors(self, "BLUE"))
     themes_menu.add_command(label="White            ", command=lambda: gmh.set_colors(self, "WHITE"))
-    # themes_menu.add_command(label="Sea              ", command=lambda: gmh.set_colors(self, "SEA"))
-    # themes_menu.add_command(label="Grey             ", command=lambda: gmh.set_colors(self, "GREY"))
-    # themes_menu.add_command(label="Night Shade      ", command=lambda: gmh.set_colors(self, "VIOLA"))
-    # themes_menu.add_command(label="Strawberry Cake  ", command=lambda: gmh.set_colors(self, "CAKE"))
     themes_menu.add_separator()
     themes_menu.add_command(label="RANDOM", command=lambda: gmh.set_colors(self, "RANDOM"))
 
@@ -398,6 +450,7 @@ def autocomplete_creation(self, pc):
 
     autocomplete_win = tk.Toplevel(self.root, bg=pc, relief=tk.RAISED)
     autocomplete_win.grid()
+    autocomplete_win.grid_propagate(False)
 
     autocomplete_win.withdraw()
     autocomplete_win.overrideredirect(True)
@@ -575,7 +628,7 @@ def current_file_right_menu(self, tc, tec):
 
     right_menu.add_command(label="Copy              ", accelerator="Ctrl+c",
                            command=lambda: right_menu.focus_get().event_generate('<<Copy>>'))
-    right_menu.add_command(label="Past              ", accelerator="Ctrl+v",
+    right_menu.add_command(label="Paste             ", accelerator="Ctrl+v",
                            command=lambda: right_menu.focus_get().event_generate('<<Paste>>'))
     right_menu.add_command(label="Cut               ", accelerator="Ctrl+x",
                            command=lambda: right_menu.focus_get().event_generate('<<Cut>>'))

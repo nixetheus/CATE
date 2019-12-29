@@ -16,7 +16,7 @@ class CATE(object):
     # Import functions from other files for cleanness
 
     # Init method:
-    def __init__(self, version, color, first_file, current_project, open_files):
+    def __init__(self, color, first_file, current_project, open_files):
 
         # ROOT
         self.root = tk.Tk()
@@ -53,6 +53,7 @@ class CATE(object):
         self.right_project_view_folder_m = None
 
         # File Path View Vars
+        self.max_cols = 0
         self.path_buttons = []
 
         # Files Bar View Vars

@@ -44,4 +44,4 @@ COLOR = settings[2].rstrip()
 
 # START
 if __name__ == "__main__":
-    app = CATE(VERSION, COLOR, FIRST_FILE, CURRENT_PROJECT, OPEN_FILES)
+    app = CATE(COLOR, FIRST_FILE, CURRENT_PROJECT, OPEN_FILES)
