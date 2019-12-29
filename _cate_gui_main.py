@@ -560,8 +560,6 @@ def current_file_view_creation(self, main_canvas, h, w, tc, tec, ln_hb, rsh, rsw
     # File content
     file_content = tk.Text(current_file_view, height=50, width=161, fg=tc, bg=tec,
                            borderwidth=0, highlightthickness=0, tabs='1c')
-    file_content.insert(tk.INSERT, "No file selected.")
-    file_content.configure(font=("helvetica", 12, "bold"))
 
     file_content.config(insertbackground=tc)
     file_content.grid(column=1, row=1, padx=5, pady=7, sticky=tk.N+tk.S+tk.W+tk.E)
@@ -571,12 +569,12 @@ def current_file_view_creation(self, main_canvas, h, w, tc, tec, ln_hb, rsh, rsw
     # Scrollbar
     scrollbar = tk.Scrollbar(current_file_view, width=rsw - int(rsw / 2.5), borderwidth=0,
                              highlightthickness=0, relief=tk.FLAT)
-
-    scrollbar.config(command=file_content.yview)
-    current_file_view.grid_rowconfigure(1, weight=1)
-    file_content.config(yscrollcommand=scrollbar.set)
-
     scrollbar.grid(row=1, column=3, sticky=tk.N+tk.S+tk.W)
+    self.scrollbar = scrollbar
+
+    current_file_view.grid_rowconfigure(1, weight=1)
+    self.scrollbar.config(command=file_content.yview)
+    file_content.config(yscrollcommand=self.scrollbar.set)
 
     # Right View file canvas
     right_side_view = tk.Canvas(current_file_view, height=rsh, width=int(rsw/2.5), bg=rsc,

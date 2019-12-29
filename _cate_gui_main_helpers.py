@@ -1668,7 +1668,7 @@ def change_text_content(self):
             pass
 
 
-# TODO:  scrollbar compatibility
+# DONE
 def create_line_number_canvas(self):
 
     lnh = int(screen_height * (87 / 100))
@@ -1689,16 +1689,24 @@ def create_line_number_canvas(self):
         ln_canvas.grid(column=0, row=1, sticky=tk.NE)
 
         # Actual lines number
-        line_number_cv = tk.Text(ln_canvas, height=lnh, width=lnw, font=big_font, fg=text_color, borderwidth=0,
+        line_number_cv = tk.Text(ln_canvas, height=49, width=lnw, font=big_font, fg=text_color, borderwidth=0,
                                  bg=ln_color, highlightthickness=0)
 
         line_number_cv.config(highlightbackground=line_number_hb)
         line_number_cv.grid(column=0, row=0, padx=10, pady=7, sticky=tk.NW)
 
-        line_number_cv.insert(tk.INSERT, "1")
+        line_number_cv.insert(tk.INSERT, "\n".join([str(line) for line in range(1, 1000)]))
         line_number_cv.config(state=tk.DISABLED)
 
         self.line_number_canvas = ln_canvas
+
+        # SCROLLBAR
+        self.scrollbar.config(command=self.file_content.yview)
+        self.file_content.config(yscrollcommand=self.scrollbar.set)
+
+        # SCROLLBAR
+        line_number_cv.yview("moveto", self.file_content.yview()[0])
+        line_number_scroll_update(self, line_number_cv)
 
         # For GUI updates
         try:
@@ -1737,6 +1745,12 @@ def create_line_number_canvas(self):
 
 
 # DONE
+def line_number_scroll_update(self, canvas):
+    canvas.yview("moveto", self.file_content.yview()[0])
+    self.root.after(10, lambda: line_number_scroll_update(self, canvas))
+
+
+# DONE
 def write_lines_number(self, canvas):
 
     if self.write_line_n:
@@ -1759,7 +1773,7 @@ def write_lines_number(self, canvas):
             canvas.config(state=tk.DISABLED)
 
         if self.write_line_n:
-            self.root.after(100, lambda: write_lines_number(self, canvas))
+            self.root.after(1000, lambda: write_lines_number(self, canvas))
 
 
 # DONE

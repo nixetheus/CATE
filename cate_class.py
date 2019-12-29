@@ -67,6 +67,7 @@ class CATE(object):
         self.project_view_buttons = []
 
         # Current File View Vars
+        self.scrollbar = None
         self.terminal_win = None
         self.file_content = None  # Content of current file
         self.autocomplete_win = None
